@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUANTUM QUARTERLY</title>
+    <style>
+        :root {
+            --bg-color: #0f0a1c;          /* Deep Violet */
+            --card-bg: #1a122e;        /* Dark Purple-Violet */
+            --accent-violet: #8a2be2;   /* Vibrant Blue-Violet */
+            --accent-light: #b388ff;    /* Bright Soft Lavender */
+            --text-main: #ffffff;       /* Pure White */
+            --text-muted: #d1c4e9;      /* Light Soft Violet-Gray */
+            --border-color: #311b92;    /* Medium Purple Border */
+            --box-bg: rgba(138, 43, 226, 0.12);
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Physics Background Canvas */
+        #physics-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Hero Header Layout */
+        header {
+            position: relative;
+            background: linear-gradient(rgba(15, 10, 28, 0.85), rgba(15, 10, 28, 0.95)), url('images/bridge.jpg') center/cover no-repeat;
+            border-bottom: 3px solid var(--accent-light);
+            padding: 40px 20px 20px 20px;
+            margin-bottom: 0;
+            text-align: center;
+        }
+        .top-banner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background-color: var(--accent-light);
+        }
+        .issue-badge {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            border: 1px solid var(--accent-light);
+            color: var(--accent-light);
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        /* Custom Atom Logo Icon */
+        .logo-icon-container {
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle, #311b92 0%, var(--bg-color) 100%);
+            border: 2px solid var(--accent-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px auto;
+            box-shadow: 0 0 25px rgba(179, 136, 255, 0.5);
+            position: relative;
+        }
+        .atom-logo {
+            width: 48px;
+            height: 48px;
+            animation: spinLogo 10s linear infinite;
+        }
+        @keyframes spinLogo {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .site-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            margin: 10px 0 0 0;
+            text-transform: uppercase;
+            font-family: 'Impact', sans-serif;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(179, 136, 255, 0.5);
+        }
+        .tagline {
+            color: var(--text-muted);
+            font-weight: bold;
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            margin-top: 5px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        /* Full Width Navigation Bar */
+        nav {
+            background-color: #160f26;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            width: 100%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            flex-wrap: wrap;
+        }
+        nav button {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: none;
+            border-bottom: 3px solid transparent;
+            padding: 14px 18px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        nav button.active, nav button:hover {
+            color: var(--text-main);
+            background-color: rgba(138, 43, 226, 0.15);
+            border-bottom: 3px solid var(--accent-light);
+        }
+
+        /* Container for Content Layout */
+        .main-wrapper {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Page Display Logic */
+        .page-view {
+            display: none;
+        }
+        .page-view.active {
+            display: block;
+        }
+        .section-title {
+            color: var(--accent-light);
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 2px solid var(--accent-violet);
+            padding-bottom: 8px;
+            margin: 0 0 20px 0;
+        }
+
+        /* Card Layouts */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--accent-light);
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+        .article-img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 3px;
+            margin-bottom: 6px;
+            border: 1px solid var(--border-color);
+        }
+        .img-caption {
+            font-size: 0.75rem;
+            color: var(--accent-light);
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+        .badge {
+            background-color: var(--accent-violet);
+            color: #ffffff;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 4px 10px;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 12px;
+            border-radius: 2px;
+        }
+        .card h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            line-height: 1.3;
+            color: #ffffff;
+        }
+        .byline {
+            color: var(--accent-light);
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        .sources {
+            font-size: 0.85rem;
+            color: var(--accent-light);
+            margin-top: 15px;
+            font-style: italic;
+        }
+        .physics-box {
+            background-color: var(--box-bg);
+            border-left: 3px solid var(--accent-light);
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #ffffff;
+            line-height: 1.5;
+            border-radius: 0 4px 4px 0;
+        }
+        .read-more-btn {
+            background-color: var(--accent-violet);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border-radius: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+        .read-more-btn:hover {
+            background-color: #7b1fa2;
+        }
+    </style>
+</head>
+<body>
+    <!-- Interactive Physics Particle & Wave Background -->
+    <canvas id="physics-bg"></canvas>
+
+    <!-- Header Section -->
+    <header>
+        <div class="top-banner-line"></div>
+        <div class="issue-badge">The Official News Publication of 12-LUKE (STEM)</div>
+        <div class="logo-icon-container">
+            <!-- SVG Atom Icon -->
+            <svg class="atom-logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="2" fill="#b388ff"/>
+                <ellipse cx="12" cy="12" rx="10" ry="4" stroke="#8a2be2" stroke-width="1.2" transform="rotate(30 12 12)"/>
+                <ellipse cx="12" cy="12" rx="10" ry="4" stroke="#b388ff" stroke-width="1.2" transform="rotate(-30 12 12)"/>
+                <ellipse cx="12" cy="12" rx="10" ry="4" stroke="#7b1fa2" stroke-width="1.2" transform="rotate(90 12 12)"/>
+            </svg>
+        </div>
+        <div class="site-title">QUANTUM QUARTERLY</div>
+        <div class="tagline">Where Physics Meets Tomorrow</div>
+    </header>
+    <nav id="nav-bar">
+        <button class="nav-btn active" onclick="showPage('home-page', this)">Home Overview</button>
+        <button class="nav-btn" onclick="showPage('main-page', this)">Main News</button>
+        <button class="nav-btn" onclick="showPage('local-page', this)">Local News</button>
+        <button class="nav-btn" onclick="showPage('national-page', this)">National</button>
+        <button class="nav-btn" onclick="showPage('intl-page', this)">International</button>
+        <button class="nav-btn" onclick="showPage('feature-page', this)">Features</button>
+        <button class="nav-btn" onclick="showPage('editorial-page', this)">Editorial</button>
+        <button class="nav-btn" onclick="showPage('opinion-page', this)">Opinion</button>
+        <button class="nav-btn" onclick="showPage('scitech-page', this)">SciTech</button>
+        <button class="nav-btn" onclick="showPage('sports-page', this)">Sports</button>
+    </nav>
+
+    <div class="main-wrapper">
+        <!-- PAGE 1: HOME OVERVIEW -->
+        <div id="home-page" class="page-view active">
+            <div class="section-title">LATEST NEWS OVERVIEW</div>
+            <article class="card">
+                <img src="images/bridge.jpg" alt="Aquino Bridge Collapse" class="article-img">
+                <div class="img-caption">Image Source: inquirnet.com</div>
+                <h2>Aquino Bridge in Tarlac City Collapses Amid Heavy Rains</h2>
+                <div class="byline">By: Bryan Ancheta — TARLAC CITY</div>
+                <p>A portion of the Aquino Bridge in Tarlac City collapsed late Friday night, August 28, amid continuous heavy rains brought by the Southwest Monsoon or Habagat and strong water currents in the Tarlac River[cite: 3].</p>
+                <button class="read-more-btn" onclick="switchNav('main-page', 1)">Read Full Article →</button>
+            </article>
+            <article class="card">
+                <img src="images/dam.jpg" alt="Collapsed Dike Portion in Tarlac City" class="article-img">
+               <div class="img-caption">Image Source: DZTC Radyo Pilipino Tarlac's Post</div>
+                <span class="badge">LOCAL NEWS PREVIEW</span>
+                <h2>Dike Portion Collapses in Tarlac City Amid Heavy Rains</h2>
+                <div class="byline">By: Hanzley Samson — GERONA, TARLAC</div>
+                <p>A portion of a flood-control dike in Barangay San Isidro, Tarlac City collapsed amid continuous heavy rainfall, damaging part of the flood-control project, the road constructed above it, and approximately 350 meters of an older slope-protection structure[cite: 3].</p>
+                <button class="read-more-btn" onclick="switchNav('local-page', 2)">Read Full Article →</button>
+            </article>
+            <article class="card">
+                <img src="images/shooting.jpg" alt="Ateneo De Zamboanga Junior High School Safety Review" class="article-img">
+                <div class="img-caption">Image Source: UNTV</div>
+                <span class="badge">NATIONAL NEWS PREVIEW</span>
+                <h2>Philippines Faces Second Fatal School Shooting in Two Months as Zamboanga Incident Prompts Safety Review</h2>
+                <div class="byline">By: Christine Manlutac</div>
+                <p>On August 18, 2026, a tragedy happened at Ateneo De Zamboanga University Junior High School, where a shooting incident occurred[cite: 3].</p>
+                <button class="read-more-btn" onclick="switchNav('national-page', 3)">Read Full Article →</button>
+            </article>
+        </div>
+
+        <!-- PAGE 2: MAIN NEWS -->
+        <div id="main-page" class="page-view">
+            <div class="section-title">MAIN NEWS COVERAGE</div>
+            <article class="card">
+                <img src="images/bridge.jpg" alt="Aquino Bridge Collapse" class="article-img">
+                <div class="img-caption">Image Source: inquirnet.com</div>
+                <span class="badge">MAIN NEWS | TARLAC</span>
+                <h2>Aquino Bridge in Tarlac City Collapses Amid Heavy Rains</h2>
+                <div class="byline">By: Bryan Ancheta — TARLAC CITY, August 29, 2026</div>
+                <p>A portion of the Aquino Bridge in Tarlac City collapsed late Friday night, August 28, amid continuous heavy rains brought by the Southwest Monsoon or Habagat and strong water currents in the Tarlac River[cite: 3]. According to reports from GMA News and the Tarlac City Government, the incident occurred at around 11:56 p.m., prompting authorities to immediately close the bridge to motorists for safety[cite: 3].</p>
+                <p>The Department of Public Works and Highways (DPWH) Tarlac 1st District Engineering Office conducted an inspection shortly after the bridge was closed[cite: 3]. Authorities are assessing the damage and monitoring the structure while coordinating with local disaster-response and engineering offices[cite: 3]. Motorists are advised to use Agana Bridge and other alternative routes while the Aquino Bridge remains closed[cite: 3].</p>
+                <p>The collapse occurred as Tarlac experienced significant rainfall associated with Habagat[cite: 3]. PAGASA reported that Tarlac was among the areas expected to receive substantial rainfall from August 28 to August 29, increasing the possibility of flooding, particularly in low-lying and riverside areas[cite: 3].</p>
+                <div class="physics-box">
+                    <strong>Physics Connection:</strong> The incident demonstrates the principles of force, pressure, and equilibrium[cite: 3]. A bridge must remain stable while supporting its own weight, the weight of vehicles, and other external forces[cite: 3]. During heavy rainfall, rising water levels and stronger river currents can exert additional forces on the bridge’s supports and foundation[cite: 3]. When these forces become greater than the structure can safely withstand, its stability may be affected[cite: 3]. The Aquino Bridge incident shows how forces from both the structure and its surrounding environment can influence the stability and strength of a bridge[cite: 3].
+                </div>
+                <div class="sources">Sources: GMA News, Inquirer, and Radyo Pilipinas[cite: 3].</div>
+            </article>
+        </div>
+
+        <!-- PAGE 3: LOCAL NEWS -->
+        <div id="local-page" class="page-view">
+            <div class="section-title">LOCAL NEWS COVERAGE</div>
+            <article class="card">
+                <span class="badge">LOCAL NEWS | GERONA</span>
+                <h2>Gerona Braces for Flood Risks as Habagat Brings Persistent Rains</h2>
+                <div class="byline">By: Hanzley Samson — GERONA, TARLAC — August 26, 2026</div>
+                <p>Residents of Gerona remained on alert as persistent rains brought by the Southwest Monsoon, or Habagat, affected parts of Central Luzon, including Tarlac[cite: 3]. The Philippine Atmospheric, Geophysical and Astronomical Services Administration (PAGASA) warned that moderate to heavy rains in Central Luzon could trigger flash floods and landslides, particularly during periods of intense rainfall[cite: 3]. (Source: PAGASA; Philippine News Agency, August 26, 2026[cite: 3].)</p>
+                <p>The weather conditions came as Habagat continued to affect Luzon[cite: 3]. According to the Philippine News Agency, PAGASA forecast scattered rains and thunderstorms across the rest of Central Luzon on August 26 and warned that moderate to heavy rainfall could result in flash floods or landslides[cite: 3]. Tarlac was again included among the provinces expected to experience monsoon rains in PAGASA's succeeding forecasts[cite: 3]. (Source: Philippine News Agency, August 26 and August 29, 2026[cite: 3].)</p>
+                <p>For communities in Gerona, prolonged rainfall can become a concern when water accumulates faster than drainage systems, soil, and waterways can accommodate it[cite: 3]. Low-lying areas and communities near waterways may face greater risks when rainfall becomes persistent or intense[cite: 3]. Residents are therefore encouraged to monitor official weather and local disaster-management announcements and remain prepared for possible changes in conditions[cite: 3].</p>
+                <p>The situation in Tarlac was part of a wider weather disturbance affecting Central Luzon[cite: 3]. On August 28, Malacañang suspended afternoon classes and government work in Tarlac and other provinces as a precaution against the expected strengthening of the Habagat[cite: 3]. The Philippine News Agency reported that the suspension followed recommendations from the National Disaster Risk Reduction and Management Council because of the potential impacts of heavy rainfall[cite: 3]. (Source: Philippine News Agency, August 28, 2026[cite: 3].)</p>
+                <p>For Gerona, the persistent August rains serve as a reminder that understanding weather conditions and preparing for possible flooding are important parts of keeping communities safe[cite: 3]. As Habagat continues to bring rain across Luzon, residents are encouraged to rely on official information from PAGASA and local authorities when making decisions during severe weather[cite: 3].</p>
+                <div class="physics-box">
+                    <strong>Physics Connection:</strong> The continuing rains also demonstrate important principles of physics, particularly fluid motion and kinetic energy[cite: 3]. Rainwater moves from higher to lower elevations because of gravity, eventually entering drainage systems, streams, and rivers[cite: 3]. As the amount of water flowing through a channel increases, its flow rate and velocity can also increase[cite: 3]. The relationship between flow rate, cross-sectional area, and velocity can be expressed as $Q = Av$, while the kinetic energy of moving water can be represented by $E_k = \frac{1}{2}mv^2$[cite: 3]. These principles help explain why rapidly moving water can exert stronger forces on riverbanks, drainage structures, and other surfaces[cite: 3].
+                </div>
+                <div class="sources">Sources: Philippine Atmospheric, Geophysical and Astronomical Services Administration (PAGASA), Regional Weather Forecasts and Weather Advisories, August 24–26, 2026; Philippine News Agency (PNA), “Rains to prevail across Luzon due to habagat,” August 26, 2026; PNA, “‘Habagat’ to continue drenching Luzon, Visayas,” August 29, 2026[cite: 3].</div>
+            </article>
+            <article class="card">
+                <img src="images/dam.jpg" alt="Collapsed Dike Portion in Tarlac City" class="article-img">
+                <div class="img-caption">Image Source: DZTC Radyo Pilipino Tarlac's Post</div>
+                <span class="badge">LOCAL NEWS | TARLAC CITY</span>
+                <h2>Dike Portion Collapses in Tarlac City Amid Heavy Rains</h2>
+                <div class="byline">By: Hanzley Samson — TARLAC CITY, Tarlac — August 26, 2026</div>
+                <p>A portion of a flood-control dike in Barangay San Isidro, Tarlac City collapsed amid continuous heavy rainfall, damaging part of the flood-control project, the road constructed above it, and approximately 350 meters of an older slope-protection structure[cite: 3]. The damaged section involved Stations 58 to 114 of the flood-control project, according to a situational report cited by the Philippine Information Agency (PIA)[cite: 3]. (Source: Philippine Information Agency, August 18, 2026[cite: 3].)</p>
+                <p>Following the collapse, the Tarlac City Government immediately coordinated with the Department of Public Works and Highways (DPWH) and other concerned agencies to assess the damage and monitor the affected area[cite: 3]. Authorities also worked to protect nearby residents and prevent further damage while wet conditions continued[cite: 3]. Temporary measures, including the placement of sandbags, were also reported as part of efforts to protect the damaged section[cite: 3]. (Sources: PIA and GMA News, August 18, 2026[cite: 3].)</p>
+                <p>The incident occurred as heavy rains associated with the Southwest Monsoon or Habagat affected parts of Luzon[cite: 3]. GMA News reported that a strong river current caused by heavy rain struck the dike in Tarlac City before the portion collapsed[cite: 3]. PAGASA also warned of heavy rainfall in parts of Luzon during the period, increasing the risk of flooding and other rain-related hazards[cite: 3]. (Source: GMA News, August 18, 2026[cite: 3].)</p>
+                <p>The collapse highlights the importance of maintaining and regularly assessing flood-control infrastructure, particularly during periods of prolonged rainfall[cite: 3]. For communities in Tarlac City, properly maintained dikes, effective drainage systems, and continuous monitoring can help reduce the risks posed by rising water levels and strong river currents[cite: 3].</p>
+                <div class="physics-box">
+                    <strong>Physics Connection:</strong> The collapse can be explained through principles of force, pressure, and equilibrium[cite: 3]. As water levels rise, water exerts pressure against structures and the surrounding soil[cite: 3]. Hydrostatic pressure increases with water depth and can be expressed as $P = \rho gh$, where $\rho$ represents water density, $g$ is gravitational acceleration, and $h$ is water depth[cite: 3]. Stronger river currents can also exert additional forces on a dike and its foundation[cite: 3]. At the same time, prolonged rainfall can saturate soil, changing its physical properties and potentially reducing its stability[cite: 3]. When the forces acting on a structure and the surrounding ground become greater than the system can safely withstand, structural or slope failure may occur[cite: 3].
+                </div>
+                <div class="sources">Sources: Philippine Information Agency (PIA), “Tarlac City gov’t mobilizes response after portion of dike collapses,” August 18, 2026; GMA News, “Heavy rain damages walls, dike in Olongapo, Tarlac,” August 18, 2026[cite: 3].</div>
+            </article>
+        </div>
+
+        <!-- PAGE 4: NATIONAL NEWS -->
+        <div id="national-page" class="page-view">
+            <div class="section-title">NATIONAL NEWS</div>
+            <article class="card">
+                <img src="images/shooting.jpg" alt="Ateneo De Zamboanga University Junior High School Safety Review" class="article-img">
+                <div class="img-caption">Image Source: UNTV</div>
+                <span class="badge">NATIONAL NEWS | SAFETY & SECURITY</span>
+                <h2>Philippines Faces Second Fatal School Shooting in Two Months as Zamboanga Incident Prompts Safety Review</h2>
+                <div class="byline">By: Christine Manlutac</div>
+                <p>On August 18, 2026, a tragedy happened at Ateneo De Zamboanga University Junior High School, where a shooting incident occurred[cite: 3]. The shooter is one of the students in this school, he shot and killed a Grade 10 student and left the others injured[cite: 3]. He then turned the gun on himself[cite: 3]. The initial police investigation showed that the student was armed with a 9mm Glock pistol which his father, a police officer, owned[cite: 3]. Criminal charges have already been filed against his father involving the school security personnel[cite: 3].</p>
+                <p>The PNP chief Gen. Jose Melencio C. Nartatez Jr. said that their duty is not just to determine what happened but it is also part of their job to make sure that the investigation is conducted responsibly and without being unfair[cite: 3].</p>
+                <p>“We owe it to the families and to the school community to get the facts right. Hindi puwedeng puro assumptions (Mere assumptions are not acceptable). We follow the evidence, respect due process, and let the proper legal process determine accountability. At the same time, we have to learn from what happened and close the gaps that may put others at risk,” Nartatez said[cite: 3].</p>
+                <p>On a Tuesday, President Ferdinand R. Marcos Jr. sent his sympathy to the victim families involved in the shooting incident[cite: 3]. He then directed law enforcement agencies to further investigate and ensure school safety and security[cite: 3].</p>
+                <p>“We will work with our schools and communities to strengthen the safeguards that protect our students and ensure that they can pursue their education without fear. Every Filipino family deserves that assurance,” the President’s statement[cite: 3].</p>
+                <p>Earlier before the incident happened, at San Jose National High School in Tacloban City, on June 22, 2026, two minors were involved in a shooting incident inside the school[cite: 3]. Three students were killed and 20 others injured[cite: 3]. One of the shooters is the nephew of Police S/Sgt. Arla Ray Pacencia, who was suggested to face criminal charges due to the firearms used by her minor nephew in the incident[cite: 3].</p>
+                <div class="physics-box">
+                    <strong>Physics Connection:</strong> In physics, when a gun is fired, the bullet is in motion and follows projectile motion[cite: 3]. It has an initial velocity, and then gravity and air resistance act on it[cite: 3]. When a bullet hits a surface, it exerts a large force in a short period of time[cite: 3]. In terms of energy, the bullet possesses kinetic energy, and when this energy is transferred during the impact it causes damage[cite: 3]. The gunshot produces a loud sound wave that travels in the air at $343\text{ m/s}$[cite: 3]. This sound may trigger alarms that can signal people to save themselves from any harm in the zone[cite: 3].
+                </div>
+                <div class="sources">Source: PNA, August 27, 2026; PCO, August 18, 2026; PNA, August 25, 2026[cite: 3].</div>
+            </article>
+        </div>
+
+        <!-- PAGE 5: INTERNATIONAL NEWS -->
+        <div id="intl-page" class="page-view">
+            <div class="section-title">INTERNATIONAL NEWS</div>
+            <article class="card">
+                <img src="images/glacial.jpg" alt="Glacial Collapse along Nepal-Tibet Border" class="article-img">
+                <div class="img-caption">Image Source: Bloomberg.com</div>
+                <span class="badge">INTERNATIONAL | NEPAL-TIBET BORDER</span>
+                <h2>Glacial Collapse Triggers Deadly Flash Flood Along Nepal–Tibet Border</h2>
+                <div class="byline">By: Vince Bautista</div>
+                <p>Rescue teams continued searching for survivors on Thursday after a massive glacier collapse triggered devastating landslides and flash floods in Nepal and China's Tibet, killing hundreds of people[cite: 3]. More than 1,000 people remain missing in Nepal as emergency crews work through debris-covered valleys and hillsides[cite: 3].</p>
+                <p>According to reports, the disaster began when the lower section of a glacier near Langtang Lirung peak broke away and crashed hundreds of meters onto the valley floor below[cite: 3]. The impact unleashed a powerful flow of ice, rock, and water, sweeping through nearby areas and causing widespread destruction[cite: 3].</p>
+                <p>The exact cause of the glacier collapse remains unclear[cite: 3]. Nepali officials initially suggested that an earthquake in the region may have triggered the event[cite: 3]. However, the U.S. Geological Survey later reported that the detected seismic activity was actually generated by the glacier's collapse and the resulting debris flow, rather than by an earthquake[cite: 3].</p>
+                <p>Satellite images provide further evidence of the disaster, showing that a large section of the glacier had broken off when compared with images taken just a few days earlier[cite: 3].</p>
+                <p>Authorities continue to monitor the affected area while rescue efforts remain underway[cite: 3]. Experts warn that glacier-related disasters may become increasingly dangerous in mountainous regions, highlighting the need for improved monitoring and early warning systems[cite: 3].</p>
+                <div class="physics-box">
+                    <strong>Physics Connection:</strong> This event is closely related to important principles of physics, including gravity, potential energy, kinetic energy, fluid motion, pressure, and momentum[cite: 3]. Water, ice, and rock located at high elevations store large amounts of gravitational potential energy due to their height above the ground[cite: 3]. When the glacier suddenly collapsed and rushed downhill, this stored energy was converted into kinetic energy, greatly increasing the speed and force of the moving debris[cite: 3]. The rapid flow generated immense pressure and momentum, resulting in the destructive landslides and flash floods that devastated communities in the region[cite: 3].
+                </div>
+                <div class="sources">Source: Reuters, August 26–27, 2026[cite: 3].</div>
+            </article>
+        </div>
+
+        <!-- PAGE 6: FEATURES -->
+        <div id="feature-page" class="page-view">
+            <div class="section-title">FEATURE ARTICLES</div>
+            <article class="card">
+                <img src="images/damdam.webp" alt="Tarlac Diversion Dam" class="article-img">
+                <div class="img-caption">Image Source: Tarlakenyo</div>
+                <span class="badge">FEATURE | AGRICULTURE</span>
+                <h2>Tarlac Irrigation Project Advances to Improve Water Supply for Agriculture</h2>
+                <div class="byline">By: Christine Manlutac</div>
+                <p>The National Irrigation Administration has stated that the Balog-Balog Multipurpose Project Phase II at San Jose, Tarlac, has reached 45.79 per cent completion[cite: 3].</p>
+                <p>Eduardo Guillen, who is the administrator of the NIA and is acting on behalf of President Ferdinand R. Marcos Jr., conducted the site inspection together with representatives from various national agencies, local government units, and farmers' groups[cite: 3].</p>
+                <p>When it is finished in 2028, the project with a cost of P20.544 billion will enable irrigation throughout the year for 34,410 hectares of farmland and will directly benefit around 21,776 farmers in Central Luzon[cite: 3].</p>
+                <p>The project will also contribute to higher food production, provide employment opportunities, and assist in achieving the country's food security objectives[cite: 3]. In addition to irrigation, the BBMP-II will also provide opportunities in the fields of aquaculture, power generation, flood control, and tourism[cite: 3]. It includes a storage dam having a water capacity of 559 million cubic metres, 313.10 kilometres of canals, a fishery area of 150 hectares, and a hydropower station with a capacity of 43.5 megawatts[cite: 3].</p>
+                <p>Alberto Sagun, who is the chairman of the irrigation association in Victoria, Tarlac, thanked President Marcos for having the project carried out for the sake of farming families[cite: 3].</p>
+                <p>“Nagpapasalamat po kami sa ating mahal na Pangulo, kay Pangulong BBM. Ito po ay isang malaking proyekto na sa darating na panahon ay magagamit po namin para sa kinabukasan ng aming mga pamilya” Sagun said[cite: 3].</p>
+                <p>The NIA has committed to completing the project by 2028[cite: 3].</p>
+                <div class="physics-box">
+                    <strong>Physics Connection:</strong> In relation to physics, water from the Balog-Balog Dam flows downhill through 313.10 km of canals due to gravity[cite: 3]. The dam’s water depth creates high pressure that pushes water to farms, even on higher ground[cite: 3]. Engineers control the flow rate to prevent erosion and ensure enough water reaches the fields[cite: 3]. The falling water also converts potential energy into kinetic energy to generate electricity[cite: 3]. By applying concepts of pressure, gravity, flow, energy, and motion, engineers can design safe and efficient irrigation systems[cite: 3].
+                </div>
+                <div class="sources">Source: PIA, July 15, 2026[cite: 3].</div>
+            </article>
+            <article class="card">
+                <img src="images/DOST.jpg" alt="Automated Furrow Irrigation System" class="article-img">
+                <div class="img-caption">Image Source: GMA Network</div>
+                <span class="badge">FEATURE | SMART FARMING</span>
+                <h2>When Technology Meets the Farm: Tarlac Turns to Smart Agriculture Against El Niño</h2>
+                <div class="byline">By: Daphne Nool — TARLAC CITY — August 5, 2026</div>
+                <p>As the threat of a stronger El Niño raises concerns over water availability and agricultural production, farmers in Tarlac are turning toward technology for a more efficient way to keep their fields productive[cite: 3]. Among the solutions being showcased by the Department of Science and Technology (DOST) is the Automated Furrow Irrigation System (AFIS), a smart farming technology designed to deliver water to crops more precisely and efficiently[cite: 3].</p>
+                <p>The technology was featured during the Technology to People Media Conference held in Tarlac, where DOST presented science-based solutions intended to help farmers adapt to changing climate conditions[cite: 3]. According to the Philippine Information Agency (PIA), the AFIS has been installed in a sugarcane plantation in Paniqui, Tarlac, where it uses irrigation flow models, multisensors, and automated controls to provide crops with the right amount of water at the right time[cite: 3].</p>
+                <p>Unlike traditional irrigation methods that require farmers to manually control the flow of water, the automated system uses sensors and controls to respond to field conditions[cite: 3]. The system is also solar-powered, allowing it to operate while reducing dependence on conventional energy sources[cite: 3]. Previous DOST-PCAARRD field trials have shown that AFIS can improve water efficiency while reducing the labor required for irrigation[cite: 3].</p>
+                <p>The technology becomes especially important as farmers prepare for the possible effects of El Niño[cite: 3]. During the conference, DOST-PAGASA Climate Monitoring and Prediction Section Chief Ana Liza Solis emphasized that the effects of El Niño can vary in intensity, duration, frequency, and impact[cite: 3]. This makes preparation and adaptation important for communities whose livelihoods depend heavily on agriculture[cite: 3].</p>
+                <p>Beyond irrigation, the conference highlighted the growing role of data and environmental monitoring in farming[cite: 3]. Weather and field information can help farmers make better decisions about when and how much water their crops need[cite: 3]. Instead of relying solely on traditional observation, smart agriculture combines sensors, weather information, automated systems, and scientific analysis to respond more accurately to changing field conditions[cite: 3].</p>
+                <p>For Tarlac farmers facing a changing climate, smart agriculture is more than a technological advancement—it represents a possible way of making limited resources work harder[cite: 3]. By combining scientific knowledge with modern equipment, technologies such as the Automated Furrow Irrigation System show how innovation can help agriculture become more efficient, adaptable, and resilient in the face of El Niño[cite: 3].</p>
+                <div class="physics-box">
+                    <strong>Physics Connection:</strong> Behind these innovations are basic physical principles[cite: 3]. The movement of water through irrigation channels involves fluid flow and pressure, while solar-powered equipment demonstrates the conversion and use of energy[cite: 3]. Sensors used to monitor environmental conditions measure physical quantities such as temperature, humidity, and soil moisture[cite: 3]. These measurements allow automated systems to determine when irrigation is needed and help reduce unnecessary water use[cite: 3].
+                </div>
+                <div class="sources">Source: Philippine Information Agency (PIA), “DOST introduces smart agricultural solutions to combat El Niño,” August 5, 2026, by Ara Jamica R. Reparejo[cite: 3].</div>
+            </article>
+            <article class="card">
+                <img src="images/PAX.jpg" alt="Pax Silica AI Hub rendered site" class="article-img">
+                <div class="img-caption">Image Source: Gulf News</div>
+                <span class="badge">FEATURE | INNOVATION</span>
+                <h2>New Clark City Set to Become Home of Major AI Technology Hub</h2>
+                <div class="byline">By: Daphne Nool — NEW CLARK CITY, TARLAC — August 7, 2026</div>
+                <p>New Clark City is poised to become a major destination for next-generation computing, advanced manufacturing, and artificial intelligence technology with the planned development of the Pax Silica AI Hub[cite: 3].</p>
+                <p>The proposed project is envisioned as a large-scale innovation and industrial complex designed to support high-density computing facilities, advanced manufacturing centers, and specialized data operations[cite: 3]. Its first phase is expected to cover approximately 500 hectares, providing the infrastructure needed to accommodate large-scale technology and manufacturing activities[cite: 3].</p>
+                <p>Development of the initial phase is expected to begin within the next three to five years[cite: 3]. Once established, the hub could strengthen New Clark City’s role as an emerging center for technology and industrial development in the Philippines, while potentially attracting investments and creating opportunities in advanced computing, manufacturing, and related industries[cite: 3].</p>
+                <div class="physics-box">
+                    <strong>Physics Connection:</strong> The operation of facilities such as AI data centers and semiconductor manufacturing plants requires the application of several fundamental principles of physics[cite: 3]. Large computing systems consume significant amounts of electrical energy, making power management essential[cite: 3]. The relationship between electrical power, voltage, and current can be expressed as $P = IV$, while the electrical energy consumed over time can be represented by $E = Pt$[cite: 3].<br><br>
+                    Heat management is another major engineering concern because powerful computers and electronic equipment generate heat while operating[cite: 3]. Cooling systems use conduction, convection, and radiation to transfer heat away from equipment and maintain suitable operating temperatures[cite: 3]. In addition, liquid-cooling systems rely on the movement of fluids to carry heat away from processors and other components[cite: 3].<br><br>
+                    Semiconductor manufacturing also depends on the physical properties of materials and the behavior of electric charge[cite: 3]. Understanding current, resistance, voltage, and the movement of charge carriers is essential in designing and operating the electronic components used in computers, artificial intelligence systems, and other modern technologies[cite: 3]. These principles demonstrate how physics plays a fundamental role in making large-scale technological facilities possible[cite: 3].
+                </div>
+            </article>
+        </div>
+
+
+        <!-- PAGE 7: EDITORIAL -->
+        <div id="editorial-page" class="page-view">
+            <div class="section-title">EDITORIAL BOARD & MASTER HEAD</div>
+            <article class="card">
+                <span class="badge">MASTHEAD</span>
+                <h2>QUANTUM QUARTERLY EDITORIAL BOARD</h2>
+                <div class="byline">S.Y. 2026–2027 | General Physics #1 Publication</div>
+                
+                <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                    <div style="background-color: var(--box-bg); padding: 15px; border-radius: 4px; border-left: 3px solid var(--accent-light);">
+                        <strong style="color: var(--accent-light); font-size: 0.8rem; text-transform: uppercase; display: block;">Editor-in-Chief & Associate Layout Artist</strong>
+                        <span style="font-size: 1.1rem; font-weight: bold; color: #ffffff;">Bryan Ancheta</span>
+                    </div>
+                    <div style="background-color: var(--box-bg); padding: 15px; border-radius: 4px; border-left: 3px solid var(--accent-light);">
+                        <strong style="color: var(--accent-light); font-size: 0.8rem; text-transform: uppercase; display: block;">Associate Editor-in-Chief</strong>
+                        <span style="font-size: 1.1rem; font-weight: bold; color: #ffffff;">Christine Manlutac</span>
+                    </div>
+                    <div style="background-color: var(--box-bg); padding: 15px; border-radius: 4px; border-left: 3px solid var(--accent-light);">
+                        <strong style="color: var(--accent-light); font-size: 0.8rem; text-transform: uppercase; display: block;">Editorial Page Editor</strong>
+                        <span style="font-size: 1.1rem; font-weight: bold; color: #ffffff;">Daphne Nool</span>
+                    </div>
+                    <div style="background-color: var(--box-bg); padding: 15px; border-radius: 4px; border-left: 3px solid var(--accent-light);">
+                        <strong style="color: var(--accent-light); font-size: 0.8rem; text-transform: uppercase; display: block;">Associate Editorial Page Editor</strong>
+                        <span style="font-size: 1.1rem; font-weight: bold; color: #ffffff;">Shaira Iglesia</span>
+                    </div>
+                    <div style="background-color: var(--box-bg); padding: 15px; border-radius: 4px; border-left: 3px solid var(--accent-light);">
+                        <strong style="color: var(--accent-light); font-size: 0.8rem; text-transform: uppercase; display: block;">Science Page Editor</strong>
+                        <span style="font-size: 1.1rem; font-weight: bold; color: #ffffff;">Vince Bautista</span>
+                    </div>
+                    <div style="background-color: var(--box-bg); padding: 15px; border-radius: 4px; border-left: 3px solid var(--accent-light);">
+                        <strong style="color: var(--accent-light); font-size: 0.8rem; text-transform: uppercase; display: block;">Layout Artist</strong>
+                        <span style="font-size: 1.1rem; font-weight: bold; color: #ffffff;">Hanzley Samson</span>
+                    </div>
+                    <div style="background-color: var(--box-bg); padding: 15px; border-radius: 4px; border-left: 3px solid var(--accent-light);">
+                        <strong style="color: var(--accent-light); font-size: 0.8rem; text-transform: uppercase; display: block;">Managing Copy Editor</strong>
+                        <span style="font-size: 1.1rem; font-weight: bold; color: #ffffff;">Jyllian Macaspac</span>
+                    </div>
+                    <div style="background-color: var(--box-bg); padding: 15px; border-radius: 4px; border-left: 3px solid var(--accent-light);">
+                        <strong style="color: var(--accent-light); font-size: 0.8rem; text-transform: uppercase; display: block;">General Physics #1 Adviser</strong>
+                        <span style="font-size: 1.1rem; font-weight: bold; color: #ffffff;">Rene Ramilo</span>
+                    </div>
+                </div>
+            </article>
+            <div class="section-title">EDITORIAL ARTICLES</div>
+            <article class="card">
+                <img src="images/COLAPSE.jpeg" alt="Glacial Collapse Editorial Impact" class="article-img">
+                <div class="img-caption">Image Source: Reuters</div>
+                <span class="badge">EDITORIAL | ENVIRONMENT</span>
+                <h2>When Glaciers Collapse, the Warning Reaches Us Too</h2>
+                <div class="byline">By: Shaira Iglesia — August 28, 2026</div>
+                <p>The collapse of a glacier near the Nepal-Tibet border may have happened thousands of kilometers away from the Philippines, but its warning should not feel distant[cite: 3]. The deadly incident has once again drawn attention to the consequences of a warming planet, from melting glaciers and rising sea levels to heavier rainfall and increased flooding[cite: 3]. In an editorial published by The Philippine Star on August 28, 2026, the incident was presented as another reminder that climate change is no longer simply a distant environmental concern—it is a growing challenge that countries must prepare for[cite: 3]. (Source: The Philippine Star, August 28, 2026[cite: 3].)</p>
+                <p>Glaciers are extremely sensitive to changes in temperature[cite: 3]. As global temperatures rise, ice can melt more rapidly, changing the amount and movement of water in mountain environments[cite: 3]. The effects do not stop in the mountains[cite: 3]. Meltwater eventually becomes part of rivers and other water systems, while changes in the global climate can contribute to shifts in rainfall patterns and more frequent or intense weather extremes[cite: 3].</p>
+                <p>For the Philippines, a country made up of thousands of islands and frequently exposed to tropical weather systems, these changes deserve serious attention[cite: 3]. Rising sea levels can threaten coastal communities, while intense rainfall can increase the risk of flooding and landslides[cite: 3]. The challenge is therefore not only about responding after disasters happen, but also about improving infrastructure, strengthening early-warning systems, protecting natural environments, and preparing communities before hazards occur[cite: 3].</p>
+                <p>The lesson from the glacier collapse is clear: environmental problems in one part of the world can have consequences that extend far beyond their immediate location[cite: 3]. Climate-related risks require long-term solutions, cooperation among nations, and decisions based on scientific evidence[cite: 3]. For the Philippines, waiting until the next major flood or climate-related disaster is not enough[cite: 3].</p>
+                <p>The question is no longer whether climate change deserves attention[cite: 3]. The question is whether we are willing to act while there is still time to reduce its risks[cite: 3]. Science can explain what is happening, technology can help us prepare, and responsible policies can help protect communities[cite: 3]. What remains is the commitment to turn that knowledge into meaningful action[cite: 3].</p>
+                <div class="physics-box">
+                    <strong>Physics Connection:</strong> The science behind these events can also be understood through fundamental physical principles[cite: 3]. Heat transfer explains how energy moves from warmer surroundings to colder ice, while a change in temperature can cause a phase change from solid ice to liquid water[cite: 3]. The movement of this water is influenced by gravity, pressure, and fluid motion[cite: 3]. These physical processes help explain how melting ice becomes flowing water and how large amounts of moving water can contribute to flooding and erosion[cite: 3].
+                </div>
+                <div class="sources">Source: The Philippine Star, “Glacial Collapse,” August 28, 2026[cite: 3].</div>
+            </article>
+        </div>
+
+        <!-- PAGE 8: OPINION -->
+        <div id="opinion-page" class="page-view">
+            <div class="section-title">OPINION / COLUMN</div>
+            <article class="card">
+                <img src="images/TEGS.jpeg" alt="Security Presence and Student Safety" class="article-img">
+                <div class="img-caption">Image Source: NET25</div>
+                <span class="badge">OPINION | COMMUNITY & SAFETY</span>
+                <h2>School Shootings: Authority, Online Influence, and Student Welfare</h2>
+                <div class="byline">By: Shaira Iglesia — August 2026</div>
+                <p>School is supposed to be a place where we learn, laugh with our friends, and make memories[cite: 3]. We enter the classroom thinking about quizzes, projects, and deadlines[cite: 3]. We should not have to worry about whether something dangerous might happen while we are simply trying to learn[cite: 3].</p>
+                <p>The school shooting in Zamboanga on August 18, 2026, has once again raised concerns about school safety and student welfare[cite: 3]. In a Philippine News Agency (PNA) opinion column by Lauengco, the incident was discussed in connection with the responsibilities of authorities, the influence of online content, and the importance of addressing the concerns faced by young people[cite: 3]. The incident also came only months after the Tacloban school shooting, adding to concerns about how schools can better protect students[cite: 3]. (Source: Philippine News Agency, Lauengco, August 2026[cite: 3].)</p>
+                <p>Schools should be places where students feel comfortable asking questions, making mistakes, and learning[cite: 3]. Safety must therefore be treated as a responsibility shared by school officials, teachers, parents, and the wider community[cite: 3]. Authorities need to maintain appropriate safety measures, strengthen emergency preparedness, and make sure that students and school personnel know how to respond when an emergency occurs[cite: 3]. (Source: Philippine News Agency, August 2026[cite: 3].)</p>
+                <p>At the same time, student welfare should not be overlooked[cite: 3]. Young people may experience academic pressure, family difficulties, social problems, or feelings of isolation[cite: 3]. These concerns should be approached with understanding rather than judgment[cite: 3]. Schools can help by providing safe spaces where students can speak with trusted adults and seek appropriate support when they are struggling[cite: 3].</p>
+                <p>The internet is another factor that deserves attention[cite: 3]. Social media can help students learn, communicate, and build communities, but online spaces can also expose young people to harmful material and negative influences[cite: 3]. Responsible digital citizenship and media literacy can help students recognize harmful content, avoid spreading it, and seek help when something online raises concerns[cite: 3]. (Source: Philippine News Agency, Lauengco, August 2026[cite: 3].)</p>
+                <p>However, safety cannot depend on technology alone[cite: 3]. It also depends on people who are willing to listen, recognize concerns, follow safety procedures, and act responsibly[cite: 3]. Teachers who pay attention to their students, parents who provide support, school authorities who take concerns seriously, and students who look after one another all have an important role in creating a safer school environment[cite: 3].</p>
+                <p>We go to school to learn, grow, and prepare for the future—not to live in fear[cite: 3]. Every student deserves a classroom where they can concentrate on their education and dreams while knowing that their safety and well-being are taken seriously[cite: 3].</p>
+                <div class="physics-box">
+                    <strong>Physics Connection:</strong> As students, we also learn how science can contribute to safety[cite: 3]. Concepts involving sound, force, and motion are applied in technologies such as alarms, warning systems, emergency equipment, and building-safety features[cite: 3]. For example, alarms use sound waves to communicate warnings, allowing people to become aware of an emergency and follow established safety procedures[cite: 3].
+                </div>
+                <div class="sources">Sources: Philippine News Agency (PNA), Lauengco, “School Shootings: Authority, Online Influence, Mental Health,” August 2026; Philippine News Agency reports on the Zamboanga and Tacloban school shooting incidents, August 2026[cite: 3].</div>
+            </article>
+        </div>
+
+        <!-- PAGE 9: SCITECH -->
+        <div id="scitech-page" class="page-view">
+            <div class="section-title">SCIENCE & TECHNOLOGY</div>
+            <article class="card">
+                <span class="badge">SCIENCE & TECH | INNOVATION</span>
+                <h2>Project NOAH Gets ₱1 Billion Boost for AI-Powered Flood Forecasting</h2>
+                <div class="byline">By: Bryan Ancheta — August 24, 2026</div>
+                <p>August 24, 2026 — As the Philippines continues to face flooding during periods of intense rainfall, science and technology are being used to improve the country's ability to predict where rising water may pose a threat[cite: 3]. The Department of Budget and Management has released ₱1 billion to the University of the Philippines System to strengthen Project NOAH's flood forecasting and disaster-prevention capabilities[cite: 3].</p>
+                <p>According to the Philippine News Agency (PNA), the funding will support artificial intelligence-powered flood forecasting, real-time hazard monitoring, equipment, scientific systems, and personnel[cite: 3]. The project is designed to help authorities identify flood risks earlier and provide information that can support disaster preparedness and response[cite: 3]. (Source: Philippine News Agency, August 24, 2026[cite: 3].)</p>
+                <p>Project NOAH uses technologies such as AI-enhanced modeling, LiDAR mapping, and data analytics to study how water moves across different landscapes[cite: 3]. By combining information about rainfall, terrain, waterways, and water levels, computer models can create simulations that help researchers estimate where flooding may occur[cite: 3].</p>
+                <p>The ₱1-billion investment shows how scientific knowledge and modern technology can work together to address a problem that affects communities across the country[cite: 3]. With more accurate environmental data and improved forecasting tools, Project NOAH aims to give communities and authorities more information and time to prepare for possible flooding[cite: 3].</p>
+                <p>In a country frequently affected by heavy rainfall and tropical weather systems, turning scientific measurements into timely warnings can make technology an important part of disaster preparedness[cite: 3].</p>
+                <div class="physics-box">
+                    <strong>Physics Connection:</strong> The technology is closely connected to fundamental physics[cite: 3]. Rainwater moves under the influence of gravity, while its movement through rivers, drainage systems, and waterways involves fluid motion[cite: 3]. Changes in water level and flow can also affect pressure and the forces acting on surrounding structures and land[cite: 3].
+                </div>
+                <div class="sources">Source: Philippine News Agency, August 24, 2026 — “DBM releases P1B for AI-powered flood forecasting, disaster prevention[cite: 3].”</div>
+            </article>
+        </div>
+
+        <!-- PAGE 10: SPORTS -->
+        <div id="sports-page" class="page-view">
+            <div class="section-title">SPORTS</div>
+            <article class="card">
+                <img src="images/AEALA.jpg" alt="Alex Eala Tennis" class="article-img">
+                <div class="img-caption">Image Source: The Guardian</div>
+                <span class="badge">SPORTS | INTERNATIONAL TENNIS</span>
+                <h2>Alex Eala Makes History With First WTA Tour-Level Singles Title</h2>
+                <div class="byline">By: Jyllian Macaspac — August 2, 2026</div>
+                <p>Filipina tennis star Alexandra Eala made history after capturing her first WTA Tour-level singles championship by defeating American top seed Jessica Pegula in the Washington Open final, 4–6, 6–4, 6–0, on August 2, 2026[cite: 3]. The victory marked a historic achievement for Philippine tennis, as Eala became the first Filipino player to win a WTA Tour-level singles title[cite: 3].</p>
+                <p>Eala faced a difficult start after Pegula took the opening set, 6–4[cite: 3]. Despite falling behind, the young Filipina remained composed and adjusted her game in the second set[cite: 3]. Eala fought back to win the set by the same score, 6–4, forcing the championship match into a deciding third set[cite: 3].</p>
+                <p>In the final set, Eala produced a dominant performance, winning all six games and shutting out Pegula, 6–0[cite: 3]. Her strong finish secured the championship and highlighted her ability to recover from an early setback and maintain her focus under pressure[cite: 3]. The victory also gave Eala another significant milestone in her rapidly developing professional career[cite: 3].</p>
+                <p>The historic win brought attention to Eala’s continued rise in international tennis[cite: 3]. Following her Washington Open triumph, she climbed to a career-high world ranking of No. 20[cite: 3]. Her achievement further strengthened her position among the leading young players in the sport and gave Filipino tennis fans another major moment to celebrate[cite: 3].</p>
+                <p>Eala’s victory is significant not only because of the title itself but also because of what it represents for Philippine tennis[cite: 3]. By becoming the first Filipino to claim a WTA Tour-level singles championship, she established a new milestone for the country and demonstrated the growing presence of Filipino athletes on the international tennis stage[cite: 3].</p>
+                <div class="physics-box">
+                    <strong>Physics Connection:</strong> The match showed how physics is important in tennis[cite: 3]. When Eala hit the ball, the force from her racket caused the ball to accelerate[cite: 3]. The strength and angle of her swing affected the ball’s speed and direction[cite: 3]. The ball’s movement also demonstrated momentum and impulse[cite: 3]. The impact between the racket and the ball changed its momentum and sent it across the court[cite: 3]. The ball’s curved path through the air showed projectile motion, while gravity affected its movement[cite: 3].<br><br>
+                    Eala’s movements around the court also demonstrated friction and Newton’s laws of motion[cite: 3]. The friction between her shoes and the court helped her stop, accelerate, and change direction quickly[cite: 3]. Her movements and racket swings show how force and motion are applied in a real sporting event[cite: 3]. Eala’s historic win was not only a major achievement for Philippine tennis but also a good example of how physics and sports work together[cite: 3].
+                </div>
+                <div class="sources">Source: Reuters, August 3, 2026[cite: 3].</div>
+            </article>
+            <article class="card">
+                <img src="images/running.jpg" alt="Hussein Loraña Running at ICTSI Philippine Open" class="article-img">
+                <div class="img-caption">Image Source: Tiebreaker Times</div>
+                <span class="badge">LOCAL SPORTS | TARLAC</span>
+                <h2>Loraña and Roda Capture 1,500-Meter Golds at Philippine Open in New Clark City</h2>
+                <div class="byline">By: Jyllian Macaspac — June 15, 2026</div>
+                <p>Hussein Loraña and Jessa Mae Roda won gold medals in the 1,500-meter events at the ICTSI Philippine Open held at the New Clark City Athletic Stadium in Capas, Tarlac[cite: 3]. Loraña finished the men’s 1,500-meter race with a time of 3:49.12[cite: 3].</p>
+                <p>During the race, both athletes continuously moved around the track while maintaining their pace[cite: 3]. They pushed their feet against the ground to move forward and adjusted their speed throughout the race[cite: 3]. Their strength, endurance, and speed helped them remain competitive until they reached the finish line[cite: 3].</p>
+                <div class="physics-box">
+                    <strong>Physics Connection:</strong> Running involves motion, velocity, acceleration, force, momentum, work, and power[cite: 3]. The athletes moved forward by applying force against the ground[cite: 3]. According to Newton’s Third Law, the ground pushes back with an equal and opposite force, helping the runners move forward[cite: 3].<br><br>
+                    Loraña’s performance can also be analyzed using speed and velocity[cite: 3]. He covered a distance of 1,500 meters in 3:49.12, showing how distance and time can be used to measure his performance[cite: 3]. His acceleration also changed as he increased or decreased his speed during the race[cite: 3].<br><br>
+                    Momentum helped the runners maintain their motion, while work and power were involved as their muscles produced force to move their bodies along the track[cite: 3]. These physics concepts show how science is connected to athletic performance[cite: 3].<br><br>
+                    The victories of Loraña and Roda highlighted their speed, strength, endurance, and determination while representing their abilities in Philippine athletics[cite: 3].
+                </div>
+                <div class="sources">Source: Philippine News Agency (PNA), June 15, 2026[cite: 3].</div>
+            </article>
+        </div>
+    </div>
+
+    <!-- JavaScript Navigation & Physics Background Animation Script -->
+    <script>
+        function showPage(pageId, btnElement) {
+            document.querySelectorAll('.page-view').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            if (btnElement) {
+                btnElement.classList.add('active');
+            }
+            window.scrollTo(0, 0);
+        }
+        function switchNav(pageId, btnIndex) {
+            const navButtons = document.querySelectorAll('.nav-btn');
+            showPage(pageId, navButtons[btnIndex]);
+        }
+
+        // Interactive Physics Background Simulation
+        const canvas = document.getElementById('physics-bg');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const particles = [];
+        const particleCount = Math.floor(window.innerWidth / 25);
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 0.8,
+                vy: (Math.random() - 0.5) * 0.8,
+                radius: Math.random() * 2 + 1
+            });
+        }
+
+        function animatePhysics() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = 'rgba(49, 27, 146, 0.15)';
+            ctx.lineWidth = 1;
+            
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                ctx.fillStyle = '#b388ff';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                for (let j = i + 1; j < particles.length; j++) {
+                    let p2 = particles[j];
+                    let dx = p.x - p2.x;
+                    let dy = p.y - p2.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 120) {
+                        ctx.strokeStyle = `rgba(138, 43, 226, ${1 - dist / 120})`;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animatePhysics);
+        }
+        animatePhysics();
+    </script>
+</body>
+</html>
